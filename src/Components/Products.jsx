@@ -7,6 +7,7 @@ import {
 import ProductCard from "../Cards/ProductCard.jsx";
 import Modal from "../Cards/Modal.jsx";
 import Pagination from "../Cards/Pagination";
+import ButtonCard from "../Cards/ButtonCard";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -19,6 +20,7 @@ function ProductList() {
   const [productsPerPage] = useState(8);
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState("All");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,6 +31,17 @@ function ProductList() {
     };
 
     fetchData();
+
+    // Event listener to update windowWidth state
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const handleSortChange = (value) => {
@@ -91,8 +104,8 @@ function ProductList() {
           Restaurants with online food delivery in Pune
         </h1>
       </div>
-      <div className="relative">
-        <div className="flex flex-wrap items-center pl-2 sm:pl-0">
+      <div className="relative pl-1 mt-2 sm:pl-2">
+        <div className="flex flex-wrap items-center pl-6 sm:pl-0">
           {/* Filters Button */}
           <button
             className="bg-white hover:bg-gray-200 text-gray-500 font-bold py-2 px-4 rounded-full shadow-md mb-2 sm:mb-0 mr-2 sm:mr-4 flex items-center"
@@ -156,8 +169,7 @@ function ProductList() {
               >
                 <path
                   fillRule="evenodd"
-                  d="M9.293 14.707a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414L10 12.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5zM5 6a1 1 0 100-2 1 1 
-0 000 2z"
+                  d="M9.293 14.707a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414L10 12.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5zM5 6a1 1 0 100-2 1 1 0 000 2z"
                   clipRule="evenodd"
                 />
               </svg>
@@ -188,8 +200,22 @@ function ProductList() {
               </div>
             )}
           </div>
+
+          {/* Conditional rendering of ButtonCards based on screen size */}
+          {windowWidth >= 640 && (
+            <>
+              <ButtonCard name={`Fast Delivery`} />
+              <ButtonCard name={`New on Swiggy`} />
+              <ButtonCard name={`Ratings 4.0+`} />
+              <ButtonCard name={`Pure Veg`} />
+              <ButtonCard name={`Offers`} />
+              <ButtonCard name={`Rs.300-Rs.600`} />
+              <ButtonCard name={`Less than Rs.300`} />
+            </>
+          )}
         </div>
       </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
         {currentProducts.map((product) => (
           <div key={product.idMeal} onClick={() => handleProductClick(product)}>
