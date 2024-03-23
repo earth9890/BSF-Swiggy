@@ -27,10 +27,44 @@ export const fetchProductsByCountry = async (country) => {
       ...meal,
       rating: generateRandomRating(),
     }));
-    return { meals: mealsWithRatings || [] };
+
+    const enrichedData = await Promise.all(
+      mealsWithRatings.map(async (dish) => {
+        const details = await fetchDishDetailsById(dish.idMeal);
+        if (details) {
+          return {
+            ...dish,
+            ...Object.fromEntries(
+              Object.entries(details).filter(
+                ([key]) => !(key in dish) && key !== "idMeal"
+              )
+            ),
+          };
+        }
+        return dish;
+      })
+    );
+
+    console.log("country", enrichedData);
+    return { meals: enrichedData || [] };
   } catch (error) {
     console.error("Error fetching products by country:", error);
     return { meals: [] };
+  }
+};
+
+export const fetchDishDetailsById = async (idMeal) => {
+  try {
+    const response = await fetch(
+      `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${idMeal}`
+    );
+
+    const data = await response.json();
+    console.log("data:", data);
+    return data.meals ? data.meals[0] : null;
+  } catch (error) {
+    console.error("Error fetching dish details:", error);
+    return null;
   }
 };
 
@@ -39,6 +73,7 @@ export const fetchCountryList = async () => {
     const response = await fetch(
       "https://www.themealdb.com/api/json/v1/1/list.php?a=list"
     );
+
     const data = await response.json();
     console.log("data:", data);
     return data.meals || [];
@@ -59,4 +94,3 @@ export const fetchProductByName = async (searchQuery) => {
     console.error("Error fetching data:", error);
   }
 };
-   

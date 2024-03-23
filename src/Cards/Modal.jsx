@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 const Modal = ({ onClose, product }) => {
+  console.log("hello : ", product);
+  // product = fetchProductByName(product.)
   const renderRatingStars = () => {
     const stars = [];
     const roundedRating = product.rating;
